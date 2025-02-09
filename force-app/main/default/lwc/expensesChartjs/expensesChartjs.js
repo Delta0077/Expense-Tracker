@@ -53,6 +53,7 @@ export default class ExpenseChartjs extends LightningElement {
                         // expense amount
                     ],
                     backgroundColor: [
+                        // random color for each expense type
                     ],
                     label: 'Dataset 1'
                 }
@@ -70,8 +71,9 @@ export default class ExpenseChartjs extends LightningElement {
             
             // For each loop to populate the data object and assign a random color to each type of expense
             result.array.forEach(item => {
-                data.datasets[0].data.push(item.totalAmount);
-                data.labels.push(item.Expense_Type__c);
+                data.datasets[0].data.push(item.totalAmount); // expense amount 
+                data.labels.push(item.Expense_Type__c); // expense type 
+                data.datasets[0].backgroundColor.push(this.getRandomColor());  // random color
             });
             const canvas = document.createElement('canvas');
             this.template.querySelector('div.chart').appendChild(canvas);
@@ -81,4 +83,13 @@ export default class ExpenseChartjs extends LightningElement {
             this.error = error;
         }
     }
+
+    getRandomColor() {
+        let letters = '0123456789ABCDEF';
+        let color = '#';
+        for (let i = 0; i < 6; i++) {
+          color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+      }
 }
