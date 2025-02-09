@@ -1,6 +1,7 @@
 import { LightningElement, api } from 'lwc';
 import chartjs from '@salesforce/resourceUrl/chartJs';
 import { loadScript } from 'lightning/platformResourceLoader';
+import getExpensesGroupByType from '@salesforce/apex/ExpenseController.getExpensesGroupByType'; // Apex method to get expenses grouped by type
 /**
  * When using this component in an LWR site, please import the below custom implementation of 'loadScript' module
  * instead of the one from 'lightning/platformResourceLoader'
@@ -24,29 +25,8 @@ export default class ExpenseChartjs extends LightningElement {
     @api endDate;
 
     config = {
-        type: 'doughnut',
-        data: {
-            datasets: [
-                {
-                    data: [
-                        generateRandomNumber(),
-                        generateRandomNumber(),
-                        generateRandomNumber(),
-                        generateRandomNumber(),
-                        generateRandomNumber()
-                    ],
-                    backgroundColor: [
-                        'rgb(255, 99, 132)',
-                        'rgb(255, 159, 64)',
-                        'rgb(255, 205, 86)',
-                        'rgb(75, 192, 192)',
-                        'rgb(54, 162, 235)'
-                    ],
-                    label: 'Dataset 1'
-                }
-            ],
-            labels: ['Red', 'Orange', 'Yellow', 'Green', 'Blue']
-        },
+        type: 'pie',
+        
         options: {
             responsive: false,
             plugins: {
@@ -66,9 +46,33 @@ export default class ExpenseChartjs extends LightningElement {
             return;
         }
         this.chartjsInitialized = true;
+        let data = {
+            datasets: [
+                {
+                    data: [
+                        // expense amount
+                    ],
+                    backgroundColor: [
+                    ],
+                    label: 'Dataset 1'
+                }
+            ],
+            labels: [
+                // expense type
+            ]
+        };
 
         try {
             await loadScript(this, chartjs);
+            
+            // Call the Apex method to get the expenses grouped by type
+            let result = await getExpensesGroupByType({startDate: this.startDate, endDate: this.endDate});
+            
+            // For each loop to populate the data object and assign a random color to each type of expense
+            result.array.forEach(item => {
+                data.datasets[0].data.push(item.totalAmount);
+                data.labels.push(item.Expense_Type__c);
+            });
             const canvas = document.createElement('canvas');
             this.template.querySelector('div.chart').appendChild(canvas);
             const ctx = canvas.getContext('2d');
