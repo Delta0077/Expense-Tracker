@@ -70,7 +70,7 @@ export default class ExpenseChartjs extends LightningElement {
             let result = await getExpensesGroupByType({startDate: this.startDate, endDate: this.endDate});
             
             // For each loop to populate the data object and assign a random color to each type of expense
-            result.array.forEach(item => {
+            result.forEach(item => {
                 data.datasets[0].data.push(item.totalAmount); // expense amount 
                 data.labels.push(item.Expense_Type__c); // expense type 
                 data.datasets[0].backgroundColor.push(this.getRandomColor());  // random color
@@ -78,6 +78,7 @@ export default class ExpenseChartjs extends LightningElement {
 
             // Assign the data object to the config object and create the chart using Chart.js
             this.config.data = data;
+
             const canvas = document.createElement('canvas');
             this.template.querySelector('div.chart').appendChild(canvas);
             const ctx = canvas.getContext('2d');
